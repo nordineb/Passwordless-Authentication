@@ -44,7 +44,12 @@ namespace ScottBrady91.PasswordlessAuthentication.Controllers
             }
             else
             {
-                var token = await userManager.GenerateUserTokenAsync(user, "Default", "passwordless-auth");
+                // default
+                //var token = await userManager.GenerateUserTokenAsync(user, "Default", "passwordless-auth");
+
+                var token = await userManager.GenerateUserTokenAsync(user, "PasswordlessLoginTotpProvider", "passwordless-auth");
+
+                
                 var url = Url.Action("LoginCallback", "Account", new {token = token, email = model.EmailAddress}, Request.Scheme);
                 System.IO.File.WriteAllText("passwordless.txt", url);
             }
@@ -56,8 +61,11 @@ namespace ScottBrady91.PasswordlessAuthentication.Controllers
         public async Task<IActionResult> LoginCallback(string token, string email)
         {
             var user = await userManager.FindByEmailAsync(email);
-            var isValid = await userManager.VerifyUserTokenAsync(user, "Default", "passwordless-auth", token);
-
+            
+            // default
+            // var isValid = await userManager.VerifyUserTokenAsync(user, "Default", "passwordless-auth", token);
+            
+            var isValid = await userManager.VerifyUserTokenAsync(user, "PasswordlessLoginTotpProvider", "passwordless-auth", token);
             if (isValid)
             {
                 await userManager.UpdateSecurityStampAsync(user);
